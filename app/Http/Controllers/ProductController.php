@@ -65,4 +65,26 @@ class ProductController extends Controller
 
         ]);
     }
+
+    public function save()
+    {
+        $input = Input::all();
+        $collectId = Collection::saveProd($input['dev'], $input['colname']);
+        $colProd = Collection_Product::saveProdInCollect($collectId, $input['prod']);
+        return response()->json([
+            'error' => 0,
+            'data'  => 'User ' . $input['dev'] . ' saved product ' . $input['prod'] . ' in collection ' . $collectId
+        ]);
+    }
+
+    public function share()
+    {
+        $input = Input::all();
+        $collectId = Collection::share($input['dev']);
+        $colProd = Collection_Product::saveProdInCollect($collectId, $input['prod']);
+        return response()->json([
+            'error' => 0,
+            'data'  => 'User ' . $input['dev'] . ' shared product ' . $input['prod'] . ' on ' . $input['tar']
+        ]);
+    }
 }

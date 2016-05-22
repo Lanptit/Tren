@@ -16,7 +16,6 @@ class CreateProductImagesTable extends Migration
             $table->string('prodId');
             $table->string('imageOrder');
             $table->string('imageUrl');
-            $table->primary(['prodId', 'imageUrl']);
             $table->timestamps();
         });
     }
