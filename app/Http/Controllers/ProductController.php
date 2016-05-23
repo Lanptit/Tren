@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use App\Http\Requests\saveProdInCollectRequest;
+use App\Http\Requests\shareProdRequest;
+use App\Http\Requests\likeProdRequest;
+use App\Http\Requests\alertProdRequest;
 use Input;
 use App\Models\Product;
 use App\Models\Collection;
@@ -25,24 +29,10 @@ class ProductController extends Controller
             array_push($productImageUrlArray, get_image_size_url($prodImage->imageUrl));
         }
 
-        $brandLogo = Brand::where('brandName', $product['tagBrand'])->select('brandLogoUrl')->first();
-        $brandLogoUrl = is_null($brandLogo)? '' : $brandLogo->brandLogoUrl;
-        
-        $colLike = Collection::findCollect($input['dev'], 'user/like');
-        if(!is_null($colLike)) {
-        	$prod = Collection_Product::where('collectId', $colLike->collectId)->where('productId', $input['prod'])->first();
-        	$productLiked = is_null($prod)? false: true;
-        } else {
-        	$productLiked = false;
-        }
+        $brandLogoUrl = Brand::getBrandLogo($product['tagBrand']);
 
-        $colAlert = Collection::findCollect($input['dev'], 'user/alert');
-        if(!is_null($colAlert)) {
-        	$prod = Collection_Product::where('collectId', $colAlert->collectId)->where('productId', $input['prod'])->first();
-        	$productAlerted = is_null($prod)? false : true;
-        } else {
-        	$productAlerted = false;
-        }
+        $productLiked = Product::getProductLikedOrAlerted($input['dev'], $input['prod'], 'user/like');
+        $productAlerted = Product::getProductLikedOrAlerted($input['dev'], $input['prod'], 'user/alert');
 
     	return response()->json([
             'error' => '0', 
@@ -66,10 +56,11 @@ class ProductController extends Controller
         ]);
     }
 
-    public function save()
+    public function save(saveProdInCollectRequest $request)
     {
-        $input = Input::all();
-        $collectId = Collection::saveProd($input['dev'], $input['colname']);
+        $input = $request->all();
+        $prod = Product::findOrFail($input['prod']);
+        $collectId = Collection::saveProd($input['dev'], $input['colname'], 'user/save');
         $colProd = Collection_Product::saveProdInCollect($collectId, $input['prod']);
         return response()->json([
             'error' => 0,
@@ -77,14 +68,36 @@ class ProductController extends Controller
         ]);
     }
 
-    public function share()
+    public function share(shareProdRequest $request)
     {
-        $input = Input::all();
+        $input = $request->all();
+        $prod = Product::findOrFail($input['prod']);
+
         $collectId = Collection::share($input['dev']);
         $colProd = Collection_Product::saveProdInCollect($collectId, $input['prod']);
         return response()->json([
             'error' => 0,
             'data'  => 'User ' . $input['dev'] . ' shared product ' . $input['prod'] . ' on ' . $input['tar']
         ]);
+    }
+
+    public function like(likeProdRequest $request)
+    {
+        $input = $request->all();
+        $data = Product::prodLikeOrAlert($input['dev'], $input['prod'], 'user/like');
+        return response()->json([
+            'error' => 0,
+            'data'  => $data
+        ]);
+    }
+
+    public function alert(alertProdRequest $request)
+    {
+        $input = $request->all();
+        $data = Product::prodLikeOrAlert($input['dev'], $input['prod'], 'user/alert');
+        return response()->json([
+            'error' => 0,
+            'data'  => $data
+        ]);       
     }
 }

@@ -97,7 +97,11 @@ Route::group(['prefix' => 'prod'], function(){
 	Route::get('/like', ['as' => 'prodLike', 'uses' =>'ProductController@like']);
 	Route::get('/save', ['as' => 'prodSave', 'uses' =>'ProductController@save']);
 	Route::get('/share', ['as' => 'prodShare', 'uses' =>'ProductController@share']);
-	Route::get('/alert', ['as' => 'prodAlert', 'uses' =>'ProductController@alert']);
+	Route::get('/alert/follow', ['as' => 'prodAlert', 'uses' =>'ProductController@alert']);
 	Route::get('/unlike', 'ProductController@unlike');
 	Route::get('/col', ['as' => 'getCol', 'uses' => 'CollectionController@getCol']);
+});
+
+Route::group(['prefix' => 'favor'], function(){
+	Route::get('col', ['as' => 'viewOneCollect', 'uses' => 'CollectionController@colAction']);
 });

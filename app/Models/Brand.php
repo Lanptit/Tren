@@ -20,4 +20,11 @@ class Brand extends Model
     			];
     	return $brands;
     }
+
+    public static function getBrandLogo($brandName)
+    {
+        $brandLogo = Brand::where('brandName', $brandName)->select('brandLogoUrl')->first();
+        $brandLogoUrl = is_null($brandLogo)? '' : $brandLogo->brandLogoUrl;
+        return $brandLogoUrl;
+    }
 }

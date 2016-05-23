@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
-use Input;
 
-class setBrandRequest extends Request
+class alertProdRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +24,8 @@ class setBrandRequest extends Request
     public function rules()
     {
         return [
-            'dev'       => 'required',
-            'brands'    => 'required',
+            'dev'   => 'required',
+            'prod'  => 'required'
         ];
     }
 }

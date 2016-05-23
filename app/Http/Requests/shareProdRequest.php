@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
-use Input;
 
-class setBrandRequest extends Request
+class shareProdRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +24,18 @@ class setBrandRequest extends Request
     public function rules()
     {
         return [
-            'dev'       => 'required',
-            'brands'    => 'required',
+            'dev'   => 'required',
+            'prod'  => 'required',
+            'tar'   => 'required'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'dev.required'   => 'Bad Token Exception',
+            'prod.required'  => 'Blank Input Exception',
+            'tar.required'   => 'Blank Input Exception'
         ];
     }
 }

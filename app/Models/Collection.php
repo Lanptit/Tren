@@ -24,13 +24,13 @@ class Collection extends Model
     }
 
 
-    public static function saveProd($dev, $colname)
+    public static function saveProd($dev, $colname, $collectType)
     {
         $col = Collection::firstOrNew(array('collectName' => $colname, 'ownerId' => $dev));
         if(empty($col->collectId))
         {
             $col->collectId = uniqid(time(),true);
-            $col->collectType = 'user/save';
+            $col->collectType = $collectType;
             $col->ownerType = 'user';
             $col->save();
         }
@@ -48,5 +48,24 @@ class Collection extends Model
         }
 
         return $col->collectId;
+    }
+
+    public static function getProdInCollect($dev, $collectId)
+    {
+        $prods = Collection::findOrFail($collectId)->products()->get();
+        $data = [];
+        foreach ($prods as $prod) {
+            $brandLogo = Brand::getBrandLogo($prod['tagBrand']);
+            array_push($data, [
+                'productId'         => $prod['prodId'],
+                'productTitle'      => $prod['prodName'],
+                'productSubTitle'   => $prod['prodName'],
+                'productImageUrl'   => get_image_size_url($prod['prodImageUrl']),
+                'brandName'         => $prod['tagBrand'],
+                'brandLogo'         => $brandLogo,
+                'productActionUrl'  => route('apiProdView').'?dev='.$dev.'&prod='.$prod['prodId'],
+            ]);
+        }
+        return $data;
     }
 }
