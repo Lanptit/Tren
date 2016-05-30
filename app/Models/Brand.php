@@ -27,4 +27,47 @@ class Brand extends Model
         $brandLogoUrl = is_null($brandLogo)? '' : $brandLogo->brandLogoUrl;
         return $brandLogoUrl;
     }
+
+    public static function moveImage($input)
+    {
+        $image = $input;
+        $nameImage = time().'-'.$image->getClientOriginalName();
+        $image->move(public_path().'/assets/image/', $nameImage);
+        return $nameImage;
+    }
+
+    public static function add($input)
+    {
+        $brand = new Brand;
+        $brand->brandId = uniqid(time(), true);
+        $brand->brandName = $input['brandName'];
+        $nameLogo = $brand->moveImage($input['brandLogoUrl']);
+        $brand->brandLogoUrl = $nameLogo;
+        $nameHeader = $brand->moveImage($input['brandHeaderUrl']);
+        $brand->brandHeaderUrl = $nameHeader;
+        $brand->save();
+        return $brand;
+    }
+
+
+
+    public static function saveDB($input, $id)
+    {
+        $brand = Brand::findOrFail($id);
+        $brand->brandName = $input['brandName'];
+        
+        if(isset($input['brandLogoUrl'])){
+            unlink(public_path().'/assets/image/'.$brand->brandLogoUrl);
+            $nameLogo = $brand->moveImage($input['brandLogoUrl']);
+            $brand->brandLogoUrl = $nameLogo;
+        }
+
+        if(isset($input['brandHeaderUrl'])) {
+            unlink(public_path().'/assets/image/'.$brand->brandHeaderUrl);
+            $nameHeader = $brand->moveImage($input['brandHeaderUrl']);
+            $brand->brandHeaderUrl = $nameHeader;
+        }
+        $brand->save();
+        return $brand;
+    }
 }

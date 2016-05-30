@@ -51,7 +51,6 @@
             </div>
             <!-- Menu supérieur -->
             <ul class="nav navbar-right top-nav">
-                <li>{!! link_to_route('home', trans('back/admin.home')) !!}</li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fa fa-user"></span> {{ auth()->user()->username }}<b class="caret"></b></a>
                     <ul class="dropdown-menu">

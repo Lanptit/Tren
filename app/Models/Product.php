@@ -53,4 +53,18 @@ class Product extends Model
         return ['productLiked' => $prodLiked, 'productAlerted' => $prodAlerted];
     }
 
+    public static function add($input){
+        $prod = new Product;
+        $prod->prodId           = uniqid(time(),true);
+        $prod->prodName         = $input['prodName'];
+        $prod->prodPrice        = $input['prodPrice']. ' VND';
+        $prod->prodDetailUrl    = $input['prodDetailUrl'];
+        $prod->tagBrand         = $input['tagBrand'];
+        $prod->tagWhat          = $input['tagWhat'];
+        $prod->tagForWhom       = $input['tagForWhom'];
+        $prod->save();
+        return $prod;
+
+    }
+
 }
