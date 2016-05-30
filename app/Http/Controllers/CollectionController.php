@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Requests\getProdInColRequest;
+use App\Http\Requests\getAllFavorColRequest;
 use Input;
 use App\Models\Collection;
 use App\Models\Brand;
@@ -38,13 +39,32 @@ class CollectionController extends Controller
 
     public function colAction(getProdInColRequest $request)
     {
-        $input = $request->all();
-
+        $input = $request->all();        
         $data = Collection::getProdInCollect($input['dev'], $input['col']);
 
         return response()->json([
             'error' => 0,
             'data'  => $data
         ]);
+    }
+
+    public function colsAction(getAllFavorColRequest $request)
+    {
+        $input= $request->all();
+        $header = [
+            'headerImageUrl'    => get_image_size_url("https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRw2GNAmQdfieYxQGcd0HnNFVr0oYATxPjlQ7X7F7KDXKmikOi6KA"),
+            'headerTitle'       => 'My collections, sub-title',
+            'headerSubTitle'    => 'Favorite collections for user '.$input['dev'].', subtitle'
+        ];
+
+        $items = Collection::getAllFavorCol($input['dev']);
+        return response()->json([
+            'error' => 0,
+            'data'  => [
+                            'header'    => $header,
+                            'items'     => $items
+                       ]
+        ]);
+
     }
 }

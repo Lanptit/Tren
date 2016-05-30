@@ -52,11 +52,21 @@ class Collection extends Model
 
     public static function getProdInCollect($dev, $collectId)
     {
-        $prods = Collection::findOrFail($collectId)->products()->get();
-        $data = [];
+        // $prods = Collection::findOrFail($collectId)->products()->get();
+        $col = Collection::findOrFail($collectId);
+        // dump($col);
+        $headerImageUrl = is_null($col['collectImage'])? get_image_size_url('https://i.ytimg.com/vi/-TpYOHh5wLY/maxresdefault.jpg') : get_image_size_url($col['collectImage']);
+        $header = [
+            'headerImageUrl'    => $headerImageUrl,
+            'headerTitle'       => $col['collectName'],
+            'headerSubTitle'    => 'Favorite collections for user '.$dev.', subtitle'
+        ];
+
+        $prods = $col->products()->get();
+        $items = [];
         foreach ($prods as $prod) {
             $brandLogo = Brand::getBrandLogo($prod['tagBrand']);
-            array_push($data, [
+            array_push($items, [
                 'productId'         => $prod['prodId'],
                 'productTitle'      => $prod['prodName'],
                 'productSubTitle'   => $prod['prodName'],
@@ -64,6 +74,32 @@ class Collection extends Model
                 'brandName'         => $prod['tagBrand'],
                 'brandLogo'         => $brandLogo,
                 'productActionUrl'  => route('apiProdView').'?dev='.$dev.'&prod='.$prod['prodId'],
+            ]);
+        }
+        return ['header' => $header, 'items' => $items];
+    }
+
+    public static function getAllFavorCol($dev)
+    {
+        $cols = Collection::where('ownerId', $dev)
+                          ->whereIn('collectType', ['user/like', 'user/save'])->get();
+        $data = [];
+        foreach ($cols as $col) 
+        {
+            $prods = $col->products()->get();
+            $imageUrlArray = [];
+            foreach ($prods as $prod) 
+            {
+                array_push($imageUrlArray, get_image_size_url($prod['prodImageUrl']));
+            }
+
+            array_push($data, [
+                'collectionId'          => $col['collectId'],
+                'collectionName'        => $col['collectName'],
+                'collectionType'        => $col['collectType'],
+                'collectionActionUrl'   => route('viewOneCollect') . '?dev=' . $dev . '&col=' . $col['collectId'],
+                'numberOfPhotos'        => count($prods),
+                'imageUrlArray'         => $imageUrlArray
             ]);
         }
         return $data;

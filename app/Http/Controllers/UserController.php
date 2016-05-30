@@ -32,6 +32,12 @@ class UserController extends Controller
     public function setBrands(setBrandRequest $request)
     {
     	$input = $request->all();
+        $numBrand = count(explode(';', $input['brands']));
+
+        if ($numBrand < 5) {
+            return response()->json(['error' => 1, 'message' => 'Please select at least 5 brands']);
+        }
+
     	$user = User::findOrFail($input['dev']);
 
         $user->prefBrands = $input['brands'];
@@ -55,7 +61,11 @@ class UserController extends Controller
     public function setBoth(initAppRequest $request)
     {
     	$input = $request->all();
-    	$user = User::add($input);
+        $numBrand = count(explode(';', $input['brands']));
+
+        if ($numBrand < 5) {
+            return response()->json(['error' => 1, 'message' => 'Please select at least 5 brands']);
+        }    	$user = User::add($input);
 
     	return response()->json([
     		'error'	=> 0,
